@@ -65,6 +65,7 @@
         Weaviate = 204,
         ChromaDB = 205,
         LangChain = 206,
+        MoonshotAI = 207,
 
         // Cloud Providers (200+)
         AWS = 200,                // AWS Access Keys

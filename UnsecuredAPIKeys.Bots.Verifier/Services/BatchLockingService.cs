@@ -53,7 +53,6 @@ namespace UnsecuredAPIKeys.Bots.Verifier.Services
                     await CleanupExpiredLocksAsync(dbContext, cancellationToken);
 
                     // Find the next available key range not already locked
-                    var validKeyGracePeriod = DateTime.UtcNow.AddHours(-1);
                     
                     // Get active batches to determine what ranges are locked
                     // Only consider batches that are truly active (not completed, failed, or expired)
@@ -66,17 +65,8 @@ namespace UnsecuredAPIKeys.Bots.Verifier.Services
                     _logger.LogDebug("Found {Count} active batches blocking key ranges", activeBatches.Count);
 
                     // Build a query for keys that need verification
-                    // Exclude keys that should NOT be checked:
-                    // - Invalid (0): Key is no longer working
-                    // - Removed (3): Repo owner requested removal
-                    // - FlaggedForRemoval (4): Removal request started
-                    // - NoLongerWorking (5): Once valid but no longer working
-                    var keysQuery = dbContext.APIKeys
-                        .Where(s => s.Status != ApiStatusEnum.Invalid && 
-                                   s.Status != ApiStatusEnum.Removed && 
-                                   s.Status != ApiStatusEnum.FlaggedForRemoval && 
-                                   s.Status != ApiStatusEnum.NoLongerWorking)
-                        .Where(s => s.Status != ApiStatusEnum.Valid || s.LastCheckedUTC == null || s.LastCheckedUTC < validKeyGracePeriod);
+                    // No restrictions on status - process all keys to ensure validity
+                    var keysQuery = dbContext.APIKeys.AsQueryable();
 
                     // Exclude keys already in active batches
                     foreach (var activeBatch in activeBatches)
@@ -95,13 +85,7 @@ namespace UnsecuredAPIKeys.Bots.Verifier.Services
                     if (!keysToProcess.Any())
                     {
                         // Let's log more details about why no keys were found
-                        var totalEligibleBeforeExclusion = await dbContext.APIKeys
-                            .Where(s => s.Status != ApiStatusEnum.Invalid && 
-                                       s.Status != ApiStatusEnum.Removed && 
-                                       s.Status != ApiStatusEnum.FlaggedForRemoval && 
-                                       s.Status != ApiStatusEnum.NoLongerWorking)
-                            .Where(s => s.Status != ApiStatusEnum.Valid || s.LastCheckedUTC == null || s.LastCheckedUTC < validKeyGracePeriod)
-                            .CountAsync(cancellationToken);
+                        var totalEligibleBeforeExclusion = await dbContext.APIKeys.CountAsync(cancellationToken);
                         
                         _logger.LogWarning("No unlocked keys available for processing. Total eligible before batch exclusion: {Count}. Active batches blocking ranges: {ActiveBatchCount}", 
                             totalEligibleBeforeExclusion, activeBatches.Count);

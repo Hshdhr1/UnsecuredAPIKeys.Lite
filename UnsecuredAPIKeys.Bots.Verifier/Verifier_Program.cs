@@ -562,22 +562,8 @@ namespace UnsecuredAPIKeys.Bots.Verifier
                     // Get the actual keys for this batch
                     // IMPORTANT: Apply the same ordering and limit as was used when creating the batch
                     // to ensure we only process the originally selected keys, not all keys in the range
-                    var validKeyGracePeriod = DateTime.UtcNow.AddHours(-1);
                     var keysToProcessQuery = dbContext.APIKeys
-                        .Where(k => k.Id >= batch.StartKeyId && k.Id <= batch.EndKeyId)
-                        .Where(s => s.Status != ApiStatusEnum.Invalid && 
-                                   s.Status != ApiStatusEnum.Removed && 
-                                   s.Status != ApiStatusEnum.FlaggedForRemoval && 
-                                   s.Status != ApiStatusEnum.NoLongerWorking)
-                        .Where(s => s.Status != ApiStatusEnum.Valid || s.LastCheckedUTC == null || s.LastCheckedUTC < validKeyGracePeriod);
-                    
-                    // Exclude ApiTypes that have verificationUse: false
-                    if (_excludedApiTypes.Any())
-                    {
-                        keysToProcessQuery = keysToProcessQuery.Where(k => !_excludedApiTypes.Contains(k.ApiType));
-                        _logger?.LogInformation("Excluding {Count} ApiTypes from verification: {ExcludedTypes}", 
-                            _excludedApiTypes.Count, string.Join(", ", _excludedApiTypes));
-                    }
+                        .Where(k => k.Id >= batch.StartKeyId && k.Id <= batch.EndKeyId);
                     
                     var keysToProcess = await keysToProcessQuery
                         .OrderBy(k => k.LastCheckedUTC ?? DateTime.MinValue)
