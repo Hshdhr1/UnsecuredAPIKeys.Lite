@@ -24,9 +24,10 @@ class TelegramBot:
 
     def setup_handlers(self):
         self.dp.message.register(self.cmd_start, Command("start"))
-        self.dp.message.register(self.process_github_token, F.text.startswith("ghp_"))
-        self.dp.message.register(self.cmd_export, F.text == "Выгрузить ключи")
-        self.dp.message.register(self.cmd_add_github, F.text == "Добавить GitHub токен")
+        self.dp.message.register(self.process_token, F.text.regexp(r"^(ghp_|glpat-|sgp_)"))
+        self.dp.message.register(self.cmd_export, F.text == "📦 Выгрузить ключи")
+        self.dp.message.register(self.cmd_add_token, F.text == "🔑 Добавить токен")
+        self.dp.message.register(self.cmd_sources, F.text == "🌐 Источники")
 
         self.dp.callback_query.register(self.verify_key_callback, F.data.startswith("verify_"))
 
@@ -40,14 +41,35 @@ class TelegramBot:
             return
 
         builder = ReplyKeyboardBuilder()
-        builder.button(text="Выгрузить ключи")
-        builder.button(text="Добавить GitHub токен")
+        builder.button(text="📦 Выгрузить ключи")
+        builder.button(text="🔑 Добавить токен")
+        builder.button(text="🌐 Источники")
         builder.adjust(2)
 
         await message.answer(
-            "Добро пожаловать! Выберите действие:",
-            reply_markup=builder.as_markup(resize_keyboard=True)
+            "💎 **UnsecuredAPIKeys Admin Bot**\n\nВыберите действие из меню ниже:",
+            reply_markup=builder.as_markup(resize_keyboard=True),
+            parse_mode="Markdown"
         )
+
+    async def cmd_sources(self, message: types.Message):
+        if message.from_user.id != self.admin_id: return
+
+        async with self.session_factory() as session:
+            stmt = select(SearchProviderToken)
+            result = await session.execute(stmt)
+            tokens = result.scalars().all()
+
+            if not tokens:
+                await message.answer("Активных источников (токенов) не найдено.")
+                return
+
+            text = "🛰 **Активные источники поиска:**\n\n"
+            for t in tokens:
+                status = "✅" if t.is_enabled else "❌"
+                text += f"{status} {t.search_provider.value}: `{t.token[:10]}...`\n"
+
+            await message.answer(text, parse_mode="Markdown")
 
     async def cmd_export(self, message: types.Message):
         if message.from_user.id != self.admin_id: return
@@ -71,24 +93,36 @@ class TelegramBot:
             if text:
                 await message.answer(text, parse_mode="Markdown")
 
-    async def cmd_add_github(self, message: types.Message):
+    async def cmd_add_token(self, message: types.Message):
         if message.from_user.id != self.admin_id: return
-        await message.answer("Пришлите ваш GitHub токен (начинается с ghp_):")
+        await message.answer(
+            "Пришлите ваш токен одного из провайдеров:\n"
+            "• **GitHub**: начинается с `ghp_`\n"
+            "• **GitLab**: начинается с `glpat-`\n"
+            "• **SourceGraph**: начинается с `sgp_`",
+            parse_mode="Markdown"
+        )
 
-    async def process_github_token(self, message: types.Message):
+    async def process_token(self, message: types.Message):
         if message.from_user.id != self.admin_id: return
 
         token = message.text.strip()
+        provider = SearchProviderEnum.UNKNOWN
+
+        if token.startswith("ghp_"): provider = SearchProviderEnum.GITHUB
+        elif token.startswith("glpat-"): provider = SearchProviderEnum.GITLAB
+        elif token.startswith("sgp_"): provider = SearchProviderEnum.SOURCEGRAPH
+
         async with self.session_factory() as session:
             new_token = SearchProviderToken(
                 token=token,
-                search_provider=SearchProviderEnum.GITHUB,
+                search_provider=provider,
                 is_enabled=True
             )
             session.add(new_token)
             await session.commit()
 
-        await message.answer(f"GitHub токен успешно добавлен и активирован.")
+        await message.answer(f"✅ Токен {provider.value} успешно добавлен и активирован.")
 
     async def notify_new_key(self, key_id: int, api_type: str, api_key: str):
         builder = InlineKeyboardBuilder()

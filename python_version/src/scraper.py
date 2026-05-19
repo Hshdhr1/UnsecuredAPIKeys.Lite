@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Optional
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
-from .database.models import APIKey, RepoReference, SearchQuery, ApiStatusEnum, SearchProviderEnum
+from .database.models import APIKey, RepoReference, SearchQuery, ApiStatusEnum, SearchProviderEnum, SearchProviderToken
 from .providers.registry import ApiProviderRegistry
 from .tg_bot import TelegramBot
 
@@ -48,20 +48,63 @@ class ScraperBot:
 
     async def process_query(self, session: AsyncSession, query: SearchQuery):
         self.logger.info(f"Running query: {query.query}")
-        # Mock GitHub search for demo
-        # In real life, we would use GitHub Search API
-        results = [
-            {
-                "repo_url": "https://github.com/example/repo",
-                "file_url": "https://github.com/example/repo/blob/main/config.py",
-                "api_key": "sk-ant-api01-discovered-key-12345",
-                "repo_owner": "example",
-                "repo_name": "repo"
-            }
-        ]
 
-        for res in results:
-            await self.save_key(session, res, query.id)
+        # Get all enabled tokens
+        stmt = select(SearchProviderToken).where(SearchProviderToken.is_enabled == True)
+        result = await session.execute(stmt)
+        tokens = result.scalars().all()
+
+        if not tokens:
+            self.logger.warning("No search provider tokens available.")
+            return
+
+        search_providers = self.registry.get_all_search_providers()
+
+        for token in tokens:
+            # Find matching provider
+            provider = next((p for p in search_providers if p.provider_name.lower() == token.search_provider.value.lower()), None)
+
+            if not provider:
+                continue
+
+            self.logger.info(f"Searching {provider.provider_name} with token {token.id}")
+            try:
+                repo_refs = await provider.search_async(query, token)
+                for ref in repo_refs:
+                    await self.process_repo_reference(session, ref, query.id, token)
+            except Exception as e:
+                self.logger.error(f"Search failed for {provider.provider_name}: {e}")
+
+    async def process_repo_reference(self, session: AsyncSession, ref: RepoReference, query_id: int, token: SearchProviderToken):
+        # Fetch content from ref.api_content_url and find keys
+        self.logger.info(f"Processing reference: {ref.file_url}")
+
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            try:
+                headers = {}
+                if ref.provider == "GitHub":
+                    headers["Authorization"] = f"token {token.token}"
+                elif ref.provider == "GitLab":
+                    headers["PRIVATE-TOKEN"] = token.token
+
+                response = await client.get(ref.api_content_url, headers=headers)
+                if response.status_code == 200:
+                    content = response.text
+                    # Run regex patterns from all providers
+                    for provider in self.providers:
+                        for pattern in provider.regex_patterns:
+                            import re
+                            matches = re.findall(pattern, content)
+                            for match in matches:
+                                await self.save_key(session, {
+                                    "api_key": match,
+                                    "repo_url": ref.repo_url,
+                                    "file_url": ref.file_url,
+                                    "repo_owner": ref.repo_owner,
+                                    "repo_name": ref.repo_name
+                                }, query_id)
+            except Exception as e:
+                self.logger.error(f"Failed to fetch content from {ref.api_content_url}: {e}")
 
     async def save_key(self, session: AsyncSession, res: Dict[str, Any], query_id: int):
         api_key_str = res["api_key"]

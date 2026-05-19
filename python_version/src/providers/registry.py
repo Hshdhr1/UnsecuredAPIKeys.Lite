@@ -8,6 +8,9 @@ from .mistral import MistralAIProvider
 from .openrouter import OpenRouterProvider
 from .deepseek import DeepSeekProvider
 from .perplexity import PerplexityAIProvider
+from .github_search import GitHubSearchProvider
+from .gitlab_search import GitLabSearchProvider
+from .sourcegraph_search import SourceGraphSearchProvider
 
 class ApiProviderRegistry:
     _providers: List[Type[BaseApiKeyProvider]] = [
@@ -21,9 +24,19 @@ class ApiProviderRegistry:
         PerplexityAIProvider
     ]
 
+    _search_providers: List[Type] = [
+        GitHubSearchProvider,
+        GitLabSearchProvider,
+        SourceGraphSearchProvider
+    ]
+
     @classmethod
     def get_all_providers(cls) -> List[BaseApiKeyProvider]:
         return [p() for p in cls._providers]
+
+    @classmethod
+    def get_all_search_providers(cls) -> List:
+        return [p() for p in cls._search_providers]
 
     @classmethod
     def get_provider_by_name(cls, name: str) -> Optional[BaseApiKeyProvider]:
