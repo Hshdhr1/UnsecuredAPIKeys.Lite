@@ -61,6 +61,7 @@ class ApiTypeEnum(str, Enum):
     WEAVIATE = "Weaviate"
     CHROMA_DB = "ChromaDB"
     LANGCHAIN = "LangChain"
+    MOONSHOT_AI = "MoonshotAI"
     AWS = "AWS"
     AZURE = "Azure"
     GCP = "GCP"
@@ -88,8 +89,8 @@ class APIKey(Base):
     search_provider: Mapped[SearchProviderEnum] = mapped_column(SQLEnum(SearchProviderEnum))
 
     last_checked_utc: Mapped[Optional[datetime]] = mapped_column(DateTime, index=True)
-    first_found_utc: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    last_found_utc: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    first_found_utc: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    last_found_utc: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     times_displayed: Mapped[int] = mapped_column(Integer, default=0)
     error_count: Mapped[int] = mapped_column(Integer, default=0)

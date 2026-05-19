@@ -1,10 +1,12 @@
 from typing import List, Type, Optional
 from .base import BaseApiKeyProvider
 from .anthropic import AnthropicProvider
+from .moonshot import MoonshotAIProvider
 
 class ApiProviderRegistry:
     _providers: List[Type[BaseApiKeyProvider]] = [
-        AnthropicProvider
+        AnthropicProvider,
+        MoonshotAIProvider
     ]
 
     @classmethod

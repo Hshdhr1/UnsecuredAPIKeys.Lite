@@ -46,13 +46,14 @@ class VerifierBot:
         self.logger.info("Verification cycle completed.")
 
     async def verify_single_key(self, session: AsyncSession, key: APIKey, client: httpx.AsyncClient):
-        # In a real scenario, we'd match the key to a provider via regex
-        # For this demo, we'll try Anthropic as an example if it looks like one
+        import re
         provider = None
         for p in self.providers:
-            # Simple check for demo purposes
-            if any(pattern in key.api_key for pattern in ["sk-ant-"]):
-                provider = p
+            for pattern in p.regex_patterns:
+                if re.search(pattern, key.api_key):
+                    provider = p
+                    break
+            if provider:
                 break
 
         if not provider:
