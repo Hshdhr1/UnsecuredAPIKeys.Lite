@@ -143,3 +143,15 @@ class ApplicationSetting(Base):
     key: Mapped[str] = mapped_column(String, primary_key=True)
     value: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String)
+
+
+class SearchProviderToken(Base):
+    __tablename__ = "search_provider_tokens"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    token: Mapped[str] = mapped_column(String, nullable=False)
+    search_provider: Mapped[SearchProviderEnum] = mapped_column(
+        SQLEnum(SearchProviderEnum), default=SearchProviderEnum.UNKNOWN
+    )
+    is_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_used_utc: Mapped[Optional[datetime]] = mapped_column(DateTime)

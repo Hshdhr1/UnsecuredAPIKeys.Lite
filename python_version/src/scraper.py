@@ -9,14 +9,16 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 
 from .database.models import APIKey, RepoReference, SearchQuery, ApiStatusEnum, SearchProviderEnum
 from .providers.registry import ApiProviderRegistry
+from .tg_bot import TelegramBot
 
 
 class ScraperBot:
-    def __init__(self, db_url: str, github_token: Optional[str] = None):
+    def __init__(self, db_url: str, github_token: Optional[str] = None, tg_bot: Optional[TelegramBot] = None):
         self.engine = create_async_engine(db_url)
         self.session_factory = async_sessionmaker(self.engine, expire_on_commit=False)
         self.logger = logging.getLogger("ScraperBot")
         self.github_token = github_token
+        self.tg_bot = tg_bot
         self.registry = ApiProviderRegistry()
         self.providers = self.registry.get_all_providers()
 
@@ -94,4 +96,9 @@ class ScraperBot:
         new_key.references.append(ref)
 
         session.add(new_key)
+        await session.flush()  # To get the ID
+
         self.logger.info(f"Saved new key found via query {query_id}")
+
+        if self.tg_bot:
+            await self.tg_bot.notify_new_key(new_key.id, str(new_key.api_type), new_key.api_key)
