@@ -19,8 +19,8 @@ namespace UnsecuredAPIKeys.Providers.AI_Providers
 
         public override IEnumerable<string> RegexPatterns =>
         [
-            @"sk-or-[a-zA-Z0-9]{24,48}",
-            @"sk-or-v1-[a-zA-Z0-9]{48,64}"
+            @"sk-or-v1-[a-zA-Z0-9]{40,128}",
+            @"sk-or-[a-zA-Z0-9]{24,48}"
         ];
 
         private class OpenRouterCreditsResponse

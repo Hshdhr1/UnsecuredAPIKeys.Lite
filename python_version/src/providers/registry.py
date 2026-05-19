@@ -2,11 +2,23 @@ from typing import List, Type, Optional
 from .base import BaseApiKeyProvider
 from .anthropic import AnthropicProvider
 from .moonshot import MoonshotAIProvider
+from .openai import OpenAIProvider
+from .google import GoogleProvider
+from .mistral import MistralAIProvider
+from .openrouter import OpenRouterProvider
+from .deepseek import DeepSeekProvider
+from .perplexity import PerplexityAIProvider
 
 class ApiProviderRegistry:
     _providers: List[Type[BaseApiKeyProvider]] = [
         AnthropicProvider,
-        MoonshotAIProvider
+        MoonshotAIProvider,
+        OpenAIProvider,
+        GoogleProvider,
+        MistralAIProvider,
+        OpenRouterProvider,
+        DeepSeekProvider,
+        PerplexityAIProvider
     ]
 
     @classmethod

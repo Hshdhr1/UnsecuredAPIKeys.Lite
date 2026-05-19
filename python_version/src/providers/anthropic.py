@@ -6,7 +6,7 @@ from .base import BaseApiKeyProvider, ValidationResult, ValidationAttemptStatus
 class AnthropicProvider(BaseApiKeyProvider):
     API_ENDPOINT = "https://api.anthropic.com/v1/messages"
     ANTHROPIC_VERSION = "2023-06-01"
-    DEFAULT_MODEL = "claude-3-5-sonnet-20240620"
+    DEFAULT_MODEL = "claude-sonnet-4-6"
 
     @property
     def provider_name(self) -> str:

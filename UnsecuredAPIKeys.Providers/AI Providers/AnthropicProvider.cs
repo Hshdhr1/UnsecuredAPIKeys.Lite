@@ -19,7 +19,7 @@ namespace UnsecuredAPIKeys.Providers.AI_Providers
     {
         private const string API_ENDPOINT = "https://api.anthropic.com/v1/messages";
         private const string ANTHROPIC_VERSION = "2023-06-01";
-        private const string DEFAULT_MODEL = "claude-sonnet-4-20250514";
+        private const string DEFAULT_MODEL = "claude-sonnet-4-6";
         private const int MAX_RETRIES = 3;
         private const int TIMEOUT_SECONDS = 30;
 

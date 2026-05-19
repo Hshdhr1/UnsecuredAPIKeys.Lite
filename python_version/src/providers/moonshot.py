@@ -67,8 +67,8 @@ class MoonshotAIProvider(BaseApiKeyProvider):
         return ValidationResult.has_http_error(status_code, f"Error {status_code}: {self.truncate_response(response_body)}")
 
     def is_valid_key_format(self, api_key: str) -> bool:
-        if not api_key or len(api_key) != 51:
+        if not api_key or len(api_key) < 23:
             return False
         if not api_key.startswith("sk-"):
             return False
-        return all(c.isalnum() for c in api_key[3:])
+        return all(c.isalnum() or c in "-_" for c in api_key[3:])

@@ -74,7 +74,7 @@ namespace UnsecuredAPIKeys.Providers.AI_Providers
         {
             return !string.IsNullOrWhiteSpace(apiKey) &&
                    apiKey.StartsWith("sk-") &&
-                   apiKey.Length == 51; // sk- (3) + 48 chars
+                   apiKey.Length >= 23;
         }
 
         private List<ModelInfo>? ParseMoonshotModels(string jsonResponse)
