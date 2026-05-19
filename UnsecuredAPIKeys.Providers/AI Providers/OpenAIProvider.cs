@@ -24,7 +24,7 @@ namespace UnsecuredAPIKeys.Providers.AI_Providers
             @"sk-proj-[A-Za-z0-9\-]{20,}",
             @"sk-svcacct-[A-Za-z0-9\-]{20,}",
             @"sk-[A-Za-z0-9]{48}",  // Standard format
-            @"Bearer sk-[A-Za-z0-9\-]{20,}"  // Keys in auth headers
+            @"sk-[A-Za-z0-9\-]{40,}" // Generic catch-all for sk-
         ];
 
         public OpenAIProvider() : base()
