@@ -19,12 +19,7 @@ class AnthropicProvider(BaseApiKeyProvider):
     @property
     def regex_patterns(self) -> Iterable[str]:
         return [
-            r"sk-ant-api\d{0,2}-[a-zA-Z0-9\-_]{40,120}",
-            r"sk-ant-[a-zA-Z0-9\-_]{40,95}",
-            r"sk-ant-v\d+-[a-zA-Z0-9\-_]{40,95}",
-            r"sk-ant-[a-zA-Z0-9]+-[a-zA-Z0-9\-_]{20,120}",
-            r"sk-ant-[a-zA-Z0-9]{40,64}",
-            r"\bsk-ant-[a-zA-Z0-9\-_]{20,120}\b"
+            r"sk-ant-api03-[a-zA-Z0-9\-_]{20,}"
         ]
 
     async def validate_key_with_client_async(

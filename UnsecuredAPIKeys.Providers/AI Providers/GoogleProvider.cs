@@ -20,8 +20,7 @@ namespace UnsecuredAPIKeys.Providers.AI_Providers
         // Regex patterns specific to Google AI keys (from Scraper_Program.cs)
         public override IEnumerable<string> RegexPatterns =>
         [
-            @"AIza[0-9A-Za-z\-_]{35}",  // Standard length is exactly 39 characters total
-            @"AIza[0-9A-Za-z\-_]{35,40}" // Allow for some variation in newer keys
+            @"AIza[0-9A-Za-z-_]{35}"
         ];
 
         public GoogleProvider() : base()

@@ -11,6 +11,8 @@ from .perplexity import PerplexityAIProvider
 from .groq import GroqProvider
 from .xai import XAIProvider
 from .zhipu import ZhipuAIProvider
+from .stripe import StripeProvider
+from .huggingface import HuggingFaceProvider
 from .github_search import GitHubSearchProvider
 from .gitlab_search import GitLabSearchProvider
 from .sourcegraph_search import SourceGraphSearchProvider
@@ -27,7 +29,9 @@ class ApiProviderRegistry:
         PerplexityAIProvider,
         GroqProvider,
         XAIProvider,
-        ZhipuAIProvider
+        ZhipuAIProvider,
+        StripeProvider,
+        HuggingFaceProvider
     ]
 
     _search_providers: List[Type] = [

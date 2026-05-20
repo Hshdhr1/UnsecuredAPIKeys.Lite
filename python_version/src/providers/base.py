@@ -135,7 +135,20 @@ class BaseApiKeyProvider(ABC):
         return api_key
 
     def is_valid_key_format(self, api_key: str) -> bool:
-        return len(api_key) >= 10
+        if len(api_key) < 10:
+            return False
+
+        # Heuristic to detect obviously fake keys
+        # If more than 50% of the key consists of the same character
+        if any(api_key.count(c) > len(api_key) * 0.5 for c in set(api_key)):
+            return False
+
+        # Detect common "nonsense" patterns
+        nonsense = ["ebani", "huesos", "idinahui", "fake", "dummy", "example"]
+        if any(n in api_key.lower() for n in nonsense):
+            return False
+
+        return True
 
     def get_max_retries(self) -> int:
         return self.DEFAULT_MAX_RETRIES

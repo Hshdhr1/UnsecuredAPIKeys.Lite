@@ -17,8 +17,7 @@ class GroqProvider(BaseApiKeyProvider):
     @property
     def regex_patterns(self) -> Iterable[str]:
         return [
-            r"gsk_[a-zA-Z0-9]{52,56}",
-            r"groq_[a-zA-Z0-9]{32,64}"
+            r"gsk_[a-zA-Z0-9]{50,}"
         ]
 
     async def validate_key_with_client_async(

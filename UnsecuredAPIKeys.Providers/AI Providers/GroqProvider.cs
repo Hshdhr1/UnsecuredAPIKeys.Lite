@@ -18,8 +18,7 @@ namespace UnsecuredAPIKeys.Providers.AI_Providers
 
         public override IEnumerable<string> RegexPatterns =>
         [
-            @"gsk_[a-zA-Z0-9]{52,56}",
-            @"groq_[a-zA-Z0-9]{32,64}"
+            @"gsk_[a-zA-Z0-9]{50,}"
         ];
 
         public GroqProvider() : base()

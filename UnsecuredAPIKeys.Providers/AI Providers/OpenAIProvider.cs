@@ -20,11 +20,7 @@ namespace UnsecuredAPIKeys.Providers.AI_Providers
         // Enhanced regex patterns for OpenAI keys
         public override IEnumerable<string> RegexPatterns =>
         [
-            @"sk-[A-Za-z0-9\-]{20,}",
-            @"sk-proj-[A-Za-z0-9\-]{20,}",
-            @"sk-svcacct-[A-Za-z0-9\-]{20,}",
-            @"sk-[A-Za-z0-9]{48}",  // Standard format
-            @"sk-[A-Za-z0-9\-]{40,}" // Generic catch-all for sk-
+            @"sk-[a-zA-Z0-9]{30,}"
         ];
 
         public OpenAIProvider() : base()

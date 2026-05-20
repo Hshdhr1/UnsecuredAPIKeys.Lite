@@ -8,32 +8,32 @@ using UnsecuredAPIKeys.Providers.Common;
 namespace UnsecuredAPIKeys.Providers.AI_Providers
 {
     /// <summary>
-    /// Provider implementation for handling HuggingFace API keys.
+    /// Provider implementation for handling Stripe API keys.
     /// </summary>
     [ApiProvider]
-    public class HuggingFaceProvider : BaseApiKeyProvider
+    public class StripeProvider : BaseApiKeyProvider
     {
-        public override string ProviderName => "HuggingFace";
-        public override ApiTypeEnum ApiType => ApiTypeEnum.HuggingFace;
+        public override string ProviderName => "Stripe";
+        public override ApiTypeEnum ApiType => ApiTypeEnum.Stripe;
 
         public override IEnumerable<string> RegexPatterns =>
         [
-            @"hf_[a-zA-Z]{30,}"
+            @"sk_test_[a-zA-Z0-9]{24}"
         ];
 
-        public HuggingFaceProvider() : base()
+        public StripeProvider() : base()
         {
         }
 
-        public HuggingFaceProvider(ILogger<HuggingFaceProvider>? logger) : base(logger)
+        public StripeProvider(ILogger<StripeProvider>? logger) : base(logger)
         {
         }
 
         protected override async Task<ValidationResult> ValidateKeyWithHttpClientAsync(string apiKey, HttpClient httpClient)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, "https://huggingface.co/api/whoami-v2");
+            using var request = new HttpRequestMessage(HttpMethod.Get, "https://api.stripe.com/v1/balance");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-            
+
             var response = await httpClient.SendAsync(request);
             string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -53,7 +53,7 @@ namespace UnsecuredAPIKeys.Providers.AI_Providers
 
         protected override bool IsValidKeyFormat(string apiKey)
         {
-            return !string.IsNullOrWhiteSpace(apiKey) && apiKey.StartsWith("hf_") && base.IsValidKeyFormat(apiKey);
+            return !string.IsNullOrWhiteSpace(apiKey) && apiKey.StartsWith("sk_test_") && base.IsValidKeyFormat(apiKey);
         }
     }
 }

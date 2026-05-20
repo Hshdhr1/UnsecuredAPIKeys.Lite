@@ -17,7 +17,7 @@ class GoogleProvider(BaseApiKeyProvider):
     @property
     def regex_patterns(self) -> Iterable[str]:
         return [
-            r"AIza[0-9A-Za-z\-_]{35,40}"
+            r"AIza[0-9A-Za-z-_]{35}"
         ]
 
     async def validate_key_with_client_async(

@@ -161,7 +161,26 @@ namespace UnsecuredAPIKeys.Providers._Base
         /// </summary>
         protected virtual bool IsValidKeyFormat(string apiKey)
         {
-            return !string.IsNullOrWhiteSpace(apiKey) && apiKey.Length >= 10;
+            if (string.IsNullOrWhiteSpace(apiKey) || apiKey.Length < 10)
+                return false;
+
+            // Heuristic to detect obviously fake keys
+            var charCounts = new Dictionary<char, int>();
+            foreach (var c in apiKey)
+            {
+                if (charCounts.ContainsKey(c)) charCounts[c]++;
+                else charCounts[c] = 1;
+
+                if (charCounts[c] > apiKey.Length * 0.5)
+                    return false;
+            }
+
+            string[] nonsense = ["ebani", "huesos", "idinahui", "fake", "dummy", "example"];
+            string lowerKey = apiKey.ToLowerInvariant();
+            if (nonsense.Any(n => lowerKey.Contains(n)))
+                return false;
+
+            return true;
         }
 
         /// <summary>

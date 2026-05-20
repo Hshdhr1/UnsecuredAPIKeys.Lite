@@ -39,12 +39,7 @@ namespace UnsecuredAPIKeys.Providers.AI_Providers
         // Enhanced regex patterns with compiled regex for better performance
         public override IEnumerable<string> RegexPatterns =>
         [
-            @"sk-ant-api\d{0,2}-[a-zA-Z0-9\-_]{40,120}",
-            @"sk-ant-[a-zA-Z0-9\-_]{40,95}",
-            @"sk-ant-v\d+-[a-zA-Z0-9\-_]{40,95}",
-            @"sk-ant-[a-zA-Z0-9]+-[a-zA-Z0-9\-_]{20,120}",
-            @"sk-ant-[a-zA-Z0-9]{40,64}",
-            @"\bsk-ant-[a-zA-Z0-9\-_]{20,120}\b"
+            @"sk-ant-api03-[a-zA-Z0-9\-_]{20,}"
         ];
 
         public AnthropicProvider() : base()

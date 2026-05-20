@@ -24,6 +24,7 @@ class TelegramBot:
     def setup_handlers(self):
         self.dp.message.register(self.cmd_start, Command("start"))
         self.dp.message.register(self.process_token, F.text.regexp(r"^(ghp_|glpat-|sgp_)"))
+        self.dp.message.register(self.cmd_selenium, F.text == "🌐 Selenium Парсинг")
         self.dp.message.register(self.cmd_export, F.text == "📦 Выгрузить ключи")
         self.dp.message.register(self.cmd_add_token, F.text == "🔑 Добавить токен")
         self.dp.message.register(self.cmd_sources, F.text == "🌐 Источники")
@@ -43,6 +44,7 @@ class TelegramBot:
         builder.button(text="📦 Выгрузить ключи", style="success")
         builder.button(text="🔑 Добавить токен", style="primary")
         builder.button(text="🌐 Источники", style="primary")
+        builder.button(text="🌐 Selenium Парсинг", style="primary")
         builder.adjust(2)
 
         await message.answer(
@@ -143,6 +145,61 @@ class TelegramBot:
             )
         except Exception as e:
             self.logger.error(f"Failed to send notification: {e}")
+
+    async def cmd_selenium(self, message: types.Message):
+        if message.from_user.id != self.admin_id: return
+
+        from .selenium_scraper import SeleniumScraper
+        from .scraper import ScraperBot
+
+        scraper = SeleniumScraper()
+
+        await message.answer("🏁 **Запуск Selenium парсинга (headless Chrome)...**\n\nЭто может занять некоторое время.", parse_mode="Markdown")
+
+        # Searching for several common patterns
+        queries = ["sk-", "sk-proj-", "AIza", "gsk_"]
+        total_results = 0
+
+        for query in queries:
+            await message.answer(f"🔍 Поиск в браузере: `{query}`", parse_mode="Markdown")
+            results = await scraper.search_github_browser(query)
+
+            if results:
+                await message.answer(f"✅ Найдено ссылок для `{query}`: {len(results)}. Начинаю обработку контента...", parse_mode="Markdown")
+
+                # Use ScraperBot logic to process these references
+                from .database.models import RepoReference, SearchProviderToken, SearchProviderEnum
+
+                async with self.session_factory() as session:
+                    # We need a dummy token object or similar if the method requires it
+                    dummy_token = SearchProviderToken(token="selenium", search_provider=SearchProviderEnum.GITHUB)
+
+                    # Create a temporary ScraperBot instance to reuse process_repo_reference
+                    # Pass correct db_url from session_factory's engine if available or use a valid dummy
+                    db_url = str(self.session_factory.kw['bind'].url)
+                    scraper_bot = ScraperBot(db_url, tg_bot=self)
+
+                    for res in results:
+                        ref = RepoReference(
+                            repo_url=res["repo_url"],
+                            file_url=res["file_url"],
+                            api_content_url=res["api_content_url"],
+                            repo_owner=res["repo_owner"],
+                            repo_name=res["repo_name"],
+                            file_path=res["file_path"],
+                            provider=res["provider"],
+                            repo_id=0,
+                            search_query_id=0,
+                            line_number=1
+                        )
+                        await scraper_bot.process_repo_reference(session, ref, 0, dummy_token)
+                        await session.commit()
+
+                total_results += len(results)
+            else:
+                await message.answer(f"ℹ️ По запросу `{query}` ничего не найдено.", parse_mode="Markdown")
+
+        await message.answer(f"🏁 **Selenium парсинг завершен.**\nВсего ссылок обработано: {total_results}", parse_mode="Markdown")
 
     async def verify_key_callback(self, callback: types.CallbackQuery):
         if callback.from_user.id != self.admin_id: return

@@ -17,8 +17,7 @@ class OpenRouterProvider(BaseApiKeyProvider):
     @property
     def regex_patterns(self) -> Iterable[str]:
         return [
-            r"sk-or-v1-[a-zA-Z0-9]{40,128}",
-            r"sk-or-[a-zA-Z0-9]{24,48}"
+            r"sk-or-v1-[a-f0-9]{64}"
         ]
 
     async def validate_key_with_client_async(

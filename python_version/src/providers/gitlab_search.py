@@ -1,6 +1,5 @@
 import asyncio
 import httpx
-import gitlab
 from typing import List
 from datetime import datetime, timezone
 from .search_base import BaseSearchProvider

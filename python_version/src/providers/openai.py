@@ -17,10 +17,7 @@ class OpenAIProvider(BaseApiKeyProvider):
     @property
     def regex_patterns(self) -> Iterable[str]:
         return [
-            r"sk-[A-Za-z0-9\-]{20,}",
-            r"sk-proj-[A-Za-z0-9\-]{20,}",
-            r"sk-svcacct-[A-Za-z0-9\-]{20,}",
-            r"sk-[A-Za-z0-9]{48}",
+            r"sk-[a-zA-Z0-9]{30,}"
         ]
 
     async def validate_key_with_client_async(
@@ -56,4 +53,6 @@ class OpenAIProvider(BaseApiKeyProvider):
         return ValidationResult.has_http_error(status_code, f"Error {status_code}: {self.truncate_response(response_body)}")
 
     def is_valid_key_format(self, api_key: str) -> bool:
-        return api_key.startswith("sk-") and len(api_key) >= 23
+        if not api_key.startswith("sk-"):
+            return False
+        return super().is_valid_key_format(api_key)
