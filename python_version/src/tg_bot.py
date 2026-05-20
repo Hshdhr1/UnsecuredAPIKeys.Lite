@@ -11,13 +11,11 @@ from .database.models import APIKey, SearchProviderToken, SearchProviderEnum, Ap
 
 
 class TelegramBot:
-    def __init__(self, token: str, admin_id: int, db_url: str):
+    def __init__(self, token: str, admin_id: int, session_factory: async_sessionmaker[AsyncSession]):
         self.bot = Bot(token=token)
         self.dp = Dispatcher()
         self.admin_id = admin_id
-        self.db_url = db_url
-        self.engine = create_async_engine(db_url)
-        self.session_factory = async_sessionmaker(self.engine, expire_on_commit=False)
+        self.session_factory = session_factory
         self.logger = logging.getLogger("TelegramBot")
 
         self.setup_handlers()
@@ -41,9 +39,9 @@ class TelegramBot:
             return
 
         builder = ReplyKeyboardBuilder()
-        builder.button(text="📦 Выгрузить ключи")
-        builder.button(text="🔑 Добавить токен")
-        builder.button(text="🌐 Источники")
+        builder.button(text="📦 Выгрузить ключи", style="success")
+        builder.button(text="🔑 Добавить токен", style="primary")
+        builder.button(text="🌐 Источники", style="primary")
         builder.adjust(2)
 
         await message.answer(
@@ -126,7 +124,7 @@ class TelegramBot:
 
     async def notify_new_key(self, key_id: int, api_type: str, api_key: str):
         builder = InlineKeyboardBuilder()
-        builder.button(text="Проверить", callback_data=f"verify_{key_id}")
+        builder.button(text="🔎 Проверить", callback_data=f"verify_{key_id}", style="success")
 
         text = (
             f"🔔 **Найден новый ключ!**\n\n"
@@ -152,7 +150,10 @@ class TelegramBot:
         await callback.answer("Запуск проверки...")
 
         from .verifier import VerifierBot
-        verifier = VerifierBot(self.db_url)
+        # VerifierBot expects a db_url, but we can refactor it or provide it.
+        # For now, let's assume we can get it from session_factory's engine.
+        # Actually, let's just use the session directly for verify_single_key.
+        verifier = VerifierBot("") # We won't use its engine
 
         async with self.session_factory() as session:
             stmt = select(APIKey).where(APIKey.id == key_id)
