@@ -11,10 +11,11 @@ from .database.models import APIKey, SearchProviderToken, SearchProviderEnum, Ap
 
 
 class TelegramBot:
-    def __init__(self, token: str, admin_id: int, session_factory: async_sessionmaker[AsyncSession]):
+    def __init__(self, token: str, admin_id: int, db_url: str, session_factory: async_sessionmaker[AsyncSession]):
         self.bot = Bot(token=token)
         self.dp = Dispatcher()
         self.admin_id = admin_id
+        self.db_url = db_url
         self.session_factory = session_factory
         self.logger = logging.getLogger("TelegramBot")
 
@@ -150,10 +151,7 @@ class TelegramBot:
         await callback.answer("Запуск проверки...")
 
         from .verifier import VerifierBot
-        # VerifierBot expects a db_url, but we can refactor it or provide it.
-        # For now, let's assume we can get it from session_factory's engine.
-        # Actually, let's just use the session directly for verify_single_key.
-        verifier = VerifierBot("") # We won't use its engine
+        verifier = VerifierBot(self.db_url)
 
         async with self.session_factory() as session:
             stmt = select(APIKey).where(APIKey.id == key_id)

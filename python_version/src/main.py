@@ -17,11 +17,17 @@ async def main():
     admin_id = int(os.getenv("TELEGRAM_ADMIN_ID", "0"))
 
     engine = create_async_engine(db_url)
+
+    # Ensure tables are created
+    from python_version.src.database.models import Base
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
     session_factory = async_sessionmaker(engine, expire_on_commit=False)
 
     bot = None
     if tg_token:
-        bot = TelegramBot(tg_token, admin_id, session_factory)
+        bot = TelegramBot(tg_token, admin_id, db_url, session_factory)
         asyncio.create_task(bot.start())
 
     scraper = ScraperBot(db_url, tg_bot=bot)

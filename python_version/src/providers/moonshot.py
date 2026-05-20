@@ -17,7 +17,8 @@ class MoonshotAIProvider(BaseApiKeyProvider):
     @property
     def regex_patterns(self) -> Iterable[str]:
         return [
-            r"sk-[A-Za-z0-9]{48}"
+            r"sk-[A-Za-z0-9]{48}",
+            r"sk-[A-Za-z0-9]{40,64}"
         ]
 
     async def validate_key_with_client_async(

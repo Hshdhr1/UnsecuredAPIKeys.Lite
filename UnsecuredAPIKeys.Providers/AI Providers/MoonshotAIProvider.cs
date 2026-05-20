@@ -22,7 +22,8 @@ namespace UnsecuredAPIKeys.Providers.AI_Providers
         // Example: sk-si6WPU0bbJIa5yALpRHfn96iZjWD1H0halJPmGZbS8eP4jqp
         public override IEnumerable<string> RegexPatterns =>
         [
-            @"sk-[A-Za-z0-9]{48}"
+            @"sk-[A-Za-z0-9]{48}",
+            @"sk-[A-Za-z0-9]{40,64}"
         ];
 
         public MoonshotAIProvider() : base()

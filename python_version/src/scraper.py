@@ -2,6 +2,7 @@ import asyncio
 import logging
 import httpx
 import re
+import base64
 from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional
 from sqlalchemy import select, update
@@ -89,11 +90,24 @@ class ScraperBot:
 
                 response = await client.get(ref.api_content_url, headers=headers)
                 if response.status_code == 200:
-                    content = response.text
+                    data = response.json()
+                    content = ""
+
+                    if ref.provider == "GitHub":
+                        # GitHub Content API returns base64 encoded content
+                        content_b64 = data.get("content", "").replace("\n", "")
+                        content = base64.b64decode(content_b64).decode("utf-8", errors="ignore")
+                    elif ref.provider == "GitLab":
+                        # GitLab Repository Files API returns base64 encoded content
+                        content_b64 = data.get("content", "")
+                        content = base64.b64decode(content_b64).decode("utf-8", errors="ignore")
+                    else:
+                        # Fallback for direct text or other providers
+                        content = response.text
+
                     # Run regex patterns from all providers
                     for provider in self.providers:
                         for pattern in provider.regex_patterns:
-                            import re
                             matches = re.findall(pattern, content)
                             for match in matches:
                                 await self.save_key(session, {

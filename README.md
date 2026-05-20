@@ -1,232 +1,93 @@
-# UnsecuredAPIKeys - Open Source Version
+# UnsecuredAPIKeys — Открытая версия
 
-A comprehensive platform for discovering, validating, and tracking unsecured API keys across various code repositories and platforms. This project serves educational and security awareness purposes by demonstrating how easily API keys can be exposed in public repositories.
+Комплексная платформа для обнаружения, валидации и отслеживания незащищенных API-ключей в различных репозиториях кода и на платформах. Этот проект предназначен для образовательных целей и повышения осведомленности о безопасности, демонстрируя, насколько легко API-ключи могут быть раскрыты в публичных репозиториях.
 
-## ⚠️ Educational Purpose Only
+## ⚠️ Только для образовательных целей
 
-This project is designed for educational and security awareness purposes. It demonstrates common security vulnerabilities in API key management. Please use responsibly and in accordance with applicable laws and regulations.
+Этот проект разработан для образовательных целей и повышения осведомленности о безопасности. Он демонстрирует распространенные уязвимости безопасности при управлении API-ключами. Пожалуйста, используйте его ответственно и в соответствии с действующими законами и нормативными актами.
 
-## 🏗️ Architecture
+## 🏗️ Архитектура
 
-The project consists of several interconnected components:
+Проект состоит из нескольких взаимосвязанных компонентов:
 
-- **WebAPI** (.NET 9): Core backend providing REST endpoints and real-time SignalR communication
-- **UI** (Next.js): Frontend interface with educational content and API key discovery features
-- **Data Layer** (Entity Framework + PostgreSQL): Comprehensive data modeling and persistence
-- **Providers Library**: Extensible validation framework for different API providers
-- **Verification Bot**: Automated validation of discovered keys
-- **Scraper Bot**: Automated discovery of API keys across platforms
+- **WebAPI** (.NET 9): Основной бэкенд, предоставляющий REST эндпоинты и SignalR.
+- **UI** (Next.js): Фронтенд-интерфейс с образовательным контентом и функциями поиска ключей.
+- **Data Layer** (Entity Framework + PostgreSQL): Моделирование данных и персистентность.
+- **Providers Library**: Расширяемый фреймворк для валидации различных провайдеров API.
+- **Python Version** (SQLAlchemy + aiogram + httpx): Полный порт ядра на Python с Telegram-ботом.
 
-## 🚀 Features
+## 🐍 Версия на Python (Новое!)
 
-### Core Functionality
-- **API Key Discovery**: Search and discover exposed API keys across multiple platforms
-- **Validation Engine**: Verify the validity and functionality of discovered keys
-- **Real-time Updates**: Live statistics and updates using SignalR
-- **Educational Interface**: Learn about API security through interactive examples
+Весь основной функционал был переписан на Python для повышения производительности и удобства использования.
+Код Python-версии доступен в директории `python_version/`.
 
-### Technical Features
-- **Modular Design**: Clean separation between discovery, validation, and presentation layers
-- **Extensible Provider System**: Easy addition of new API validation providers
-- **Comprehensive Analytics**: Track discoveries, validations, and security metrics
-- **Rate Limiting**: Intelligent rate limiting with user-based overrides
-- **Discord Integration**: Enhanced features for authenticated users
+**Ссылка на разработку порта:** [GitHub Repository](https://github.com/Hshdhr1/UnsecuredAPIKeys.Lite/tree/python-port-core-14703047987991639479)
 
-## 🛠️ Technology Stack
+### Особенности Python-версии:
+- **Асинхронная архитектура**: Использование `asyncio` и `httpx` для быстрой проверки ключей.
+- **Multi-Source Scraper**: Поддержка поиска в GitHub, GitLab и SourceGraph.
+- **Telegram Admin Bot**: Управление системой через Telegram на базе `aiogram` v3.
+  - Цветные кнопки (Bot API 9.4+).
+  - Уведомления о найденных ключах в реальном времени.
+  - Кнопка «Проверить» прямо в сообщении.
+- **Поддержка современных моделей (2026)**: GPT-5.4, Claude 4.6, Gemini 2.5 и др.
+- **Новые провайдеры**: Moonshot AI (Kimi), xAI (Grok), Zhipu AI (GLM).
 
-### Backend
-- **.NET 9** - Modern web API framework
-- **Entity Framework Core** - ORM for database operations
-- **PostgreSQL** - Primary database
-- **SignalR** - Real-time communication
-- **Docker** - Containerization support
+## 🚀 Быстрый старт (Python)
 
-### Frontend
-- **Next.js 14** - React framework with TypeScript
-- **HeroUI** - Modern component library
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Animation library
-
-### Development Tools
-- **Docker Compose** - Multi-container development
-- **Entity Framework Migrations** - Database schema management
-- **Sentry** - Error tracking and monitoring
-- **GitHub Actions** - CI/CD pipeline
-
-## 📋 Prerequisites
-
-- **Docker** and **Docker Compose**
-- **PostgreSQL** database
-- **.NET 9 SDK**
-- **Node.js 18+** and **npm/yarn**
-- **(Optional)** Discord Application for OAuth
-- **(Optional)** Sentry account for error tracking
-
-## 🚀 Quick Start
-
-### 1. Clone the Repository
+### 1. Установка зависимостей
 ```bash
-git clone https://github.com/TSCarterJr/UnsecuredAPIKeys-OpenSource.git
-cd UnsecuredAPIKeys-OpenSource
+pip install -r python_version/requirements.txt
 ```
 
-### 2. Set Up Environment Variables
+### 2. Настройка переменных окружения
+Создайте файл `.env` в корне проекта:
+```env
+DATABASE_URL=sqlite+aiosqlite:///dev.db
+TELEGRAM_BOT_TOKEN=ваш_токен
+TELEGRAM_ADMIN_ID=ваш_id
+```
+
+### 3. Запуск
 ```bash
-# Copy example configuration files
-cp UnsecuredAPIKeys.WebAPI/appsettings.example.json UnsecuredAPIKeys.WebAPI/appsettings.json
-cp UnsecuredAPIKeys.UI/.env.example UnsecuredAPIKeys.UI/.env.development
-cp UnsecuredAPIKeys.Bots.Verifier/appsettings.example.json UnsecuredAPIKeys.Bots.Verifier/appsettings.json
+python3 python_version/src/main.py
 ```
 
-### 3. Start the Database
-```bash
-docker run --name unsecured-api-keys-db \
-  -e POSTGRES_DB=UnsecuredAPIKeys \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=your_password \
-  -p 5432:5432 \
-  -d postgres:15
-```
+## 🛠️ Технологический стек
 
-### 4. Run Database Migrations
-```bash
-cd UnsecuredAPIKeys.WebAPI
-dotnet ef database update --project ../UnsecuredAPIKeys.Data --startup-project .
-```
+### Бэкенд (Оригинал)
+- **.NET 9**
+- **Entity Framework Core**
+- **PostgreSQL**
+- **SignalR**
 
-### 5. Start the Applications
+### Бэкенд (Python)
+- **Python 3.12+**
+- **SQLAlchemy 2.0**
+- **aiogram 3.x**
+- **httpx**
+- **aiosqlite / asyncpg**
 
-#### WebAPI
-```bash
-cd UnsecuredAPIKeys.WebAPI
-dotnet run
-```
+### Фронтенд
+- **Next.js 14**
+- **HeroUI / Tailwind CSS**
+- **Framer Motion**
 
-#### UI
-```bash
-cd UnsecuredAPIKeys.UI
-npm install
-npm run dev
-```
+## 📝 Лицензия
 
-#### Verification Bot
-```bash
-cd UnsecuredAPIKeys.Bots.Verifier
-dotnet run
-```
+Этот проект распространяется под **кастомной лицензией с обязательным указанием авторства**, основанной на MIT — подробности см. в файле [LICENSE](LICENSE).
 
-### 6. Access the Application
-- **UI**: http://localhost:3000
-- **API**: http://localhost:7227
-- **API Documentation**: http://localhost:7227/scalar/v1
+### ⚠️ ВАЖНОЕ ТРЕБОВАНИЕ ОБ АТРИБУЦИИ
 
-## 📚 Documentation
+**Любое использование этого кода (даже частичное) требует указания авторства в интерфейсе.** Если вы используете ЛЮБУЮ часть этого проекта в ПО с публичным интерфейсом, вы ДОЛЖНЫ:
 
-- **[Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Comprehensive deployment instructions
-- **[Open Source Cleanup Plan](docs/OPEN_SOURCE_CLEANUP_PLAN.md)** - Details about the open source preparation
-- **[API Documentation](docs/API_PROVIDER_BOT_USAGE_GUIDE.md)** - API provider integration guide
-- **[UI Implementation Summary](docs/UI_IMPLEMENTATION_SUMMARY.md)** - Frontend architecture overview
+- Разместить ссылку на этот репозиторий GitHub в вашем UI.
+- Текст ссылки должен быть «На базе UnsecuredAPIKeys Open Source» или аналогичный.
+- Ссылка: `https://github.com/TSCarterJr/UnsecuredAPIKeys-OpenSource`
+- Должна быть видна на главной странице или в футере.
 
-## 🏗️ Development
-
-### Project Structure
-```
-UnsecuredAPIKeys-OpenSource/
-├── UnsecuredAPIKeys.WebAPI/          # Main API server
-├── UnsecuredAPIKeys.UI/              # Next.js frontend
-├── UnsecuredAPIKeys.Data/            # Entity Framework data layer
-├── UnsecuredAPIKeys.Providers/       # API provider validation logic
-├── UnsecuredAPIKeys.Bots.Verifier/   # Verification bot
-├── UnsecuredAPIKeys.Bots.Scraper/    # Scraper bot
-├── UnsecuredAPIKeys.Common/          # Shared utilities
-└── docs/                             # Documentation
-```
-
-### Key Design Patterns
-- **Repository Pattern**: Clean data access abstraction
-- **Provider Pattern**: Extensible API validation system
-- **CQRS**: Separation of read/write operations
-- **Event-Driven**: Real-time updates using SignalR
-- **Modular Architecture**: Independent, testable components
-
-## 🔧 Configuration
-
-### Environment Variables
-
-#### WebAPI
-```bash
-CONNECTION_STRING="Host=localhost;Database=UnsecuredAPIKeys;Username=postgres;Password=your_password;Port=5432"
-PRODUCTION_DOMAIN="yourdomain.com"
-SCRAPER_SERVICE_NAME="api-scraper"
-VERIFIER_SERVICE_NAME="api-verifier"
-```
-
-#### UI
-```bash
-NEXT_PUBLIC_API_URL="http://localhost:7227"
-NEXT_PUBLIC_GA_MEASUREMENT_ID="YOUR_GA_MEASUREMENT_ID"
-SENTRY_ORG="your-sentry-org"
-SENTRY_PROJECT="your-sentry-project"
-```
-
-### Optional Integrations
-- **Discord OAuth**: Enhanced rate limits and user features
-- **Google Analytics**: Usage tracking and insights
-- **Sentry**: Error tracking and performance monitoring
-
-## 🤝 Contributing
-
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Commit your changes**: `git commit -m 'Add amazing feature'`
-4. **Push to the branch**: `git push origin feature/amazing-feature`
-5. **Open a Pull Request**
-
-### Development Guidelines
-- Follow .NET and React best practices
-- Include tests for new features
-- Update documentation for API changes
-- Ensure all builds pass before submitting
-
-## 📝 License
-
-This project is licensed under a **custom attribution-required license** based on MIT - see the [LICENSE](LICENSE) file for complete details.
-
-### ⚠️ IMPORTANT ATTRIBUTION REQUIREMENT
-
-**Any use of this code (even partial) requires UI attribution.** If you use ANY portion of this project in software with a public-facing interface, you MUST:
-
-- Display a link to this GitHub repository in your UI
-- Link text should be "Based on UnsecuredAPIKeys Open Source" or similar  
-- Link to: `https://github.com/TSCarterJr/UnsecuredAPIKeys-OpenSource`
-- Must be visible on main page or footer
-
-This applies whether you use the entire project, just the backend APIs, validation logic, bots, or any other component. **Removing attribution violates the license and constitutes copyright infringement.**
-
-## ⚖️ Legal and Ethical Considerations
-
-- **Educational Purpose**: This tool is designed for security education and awareness
-- **Responsible Use**: Users are responsible for compliance with applicable laws
-- **No Warranty**: The software is provided as-is without warranty
-- **Ethical Guidelines**: Use only for legitimate security research and education
-
-## 🙏 Acknowledgments
-
-- The open source community for inspiration and tools
-- Security researchers who highlight the importance of proper API key management
-- Contributors who help improve the project
-
-## 🌐 Domain Available
-
-The domain **unsecuredapikeys.com** is available for sale. If you're interested in acquiring this domain for your own security-focused project or business, please reach out through the GitHub repository.
-
-## 📞 Support
-
-For issues specific to this open source version:
-- Check the [Issues](https://github.com/TSCarterJr/UnsecuredAPIKeys-OpenSource/issues) section
-- Create a new issue with detailed information about your setup
-- Provide logs and configuration details (without sensitive information)
+Это относится ко всему проекту, только к API бэкенда, логике валидации, ботам или любому другому компоненту. **Удаление атрибуции нарушает лицензию и является нарушением авторских прав.**
 
 ---
 
-**Remember**: This project is for educational purposes. Always use responsibly and in accordance with applicable laws and regulations.
+**Помните**: этот проект предназначен для образовательных целей. Всегда используйте его ответственно.
