@@ -101,7 +101,8 @@ class ScraperBot:
                                     "repo_url": ref.repo_url,
                                     "file_url": ref.file_url,
                                     "repo_owner": ref.repo_owner,
-                                    "repo_name": ref.repo_name
+                                    "repo_name": ref.repo_name,
+                                    "search_provider": ref.provider
                                 }, query_id)
             except Exception as e:
                 self.logger.error(f"Failed to fetch content from {ref.api_content_url}: {e}")
@@ -118,10 +119,16 @@ class ScraperBot:
             return
 
         now = datetime.now(timezone.utc)
+        provider_name = res.get("search_provider", "GitHub")
+        try:
+            provider_enum = SearchProviderEnum(provider_name)
+        except ValueError:
+            provider_enum = SearchProviderEnum.UNKNOWN
+
         new_key = APIKey(
             api_key=api_key_str,
             status=ApiStatusEnum.UNVERIFIED,
-            search_provider=SearchProviderEnum.GITHUB,
+            search_provider=provider_enum,
             first_found_utc=now,
             last_found_utc=now
         )

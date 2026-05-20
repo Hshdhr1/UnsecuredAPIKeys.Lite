@@ -8,6 +8,9 @@ from .mistral import MistralAIProvider
 from .openrouter import OpenRouterProvider
 from .deepseek import DeepSeekProvider
 from .perplexity import PerplexityAIProvider
+from .groq import GroqProvider
+from .xai import XAIProvider
+from .zhipu import ZhipuAIProvider
 from .github_search import GitHubSearchProvider
 from .gitlab_search import GitLabSearchProvider
 from .sourcegraph_search import SourceGraphSearchProvider
@@ -21,7 +24,10 @@ class ApiProviderRegistry:
         MistralAIProvider,
         OpenRouterProvider,
         DeepSeekProvider,
-        PerplexityAIProvider
+        PerplexityAIProvider,
+        GroqProvider,
+        XAIProvider,
+        ZhipuAIProvider
     ]
 
     _search_providers: List[Type] = [

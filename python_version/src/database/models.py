@@ -62,6 +62,8 @@ class ApiTypeEnum(str, Enum):
     CHROMA_DB = "ChromaDB"
     LANGCHAIN = "LangChain"
     MOONSHOT_AI = "MoonshotAI"
+    XAI = "XAI"
+    ZHIPU_AI = "ZhipuAI"
     AWS = "AWS"
     AZURE = "Azure"
     GCP = "GCP"

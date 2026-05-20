@@ -66,6 +66,8 @@
         ChromaDB = 205,
         LangChain = 206,
         MoonshotAI = 207,
+        XAI = 208,
+        ZhipuAI = 209,
 
         // Cloud Providers (200+)
         AWS = 200,                // AWS Access Keys
