@@ -113,6 +113,8 @@ class TelegramBot:
         if token.startswith("ghp_"): provider = SearchProviderEnum.GITHUB
         elif token.startswith("glpat-"): provider = SearchProviderEnum.GITLAB
         elif token.startswith("sgp_"): provider = SearchProviderEnum.SOURCEGRAPH
+        elif token == "pastebin": provider = SearchProviderEnum.PASTEBIN
+        elif token == "termbin": provider = SearchProviderEnum.TERMBIN
 
         async with self.session_factory() as session:
             new_token = SearchProviderToken(

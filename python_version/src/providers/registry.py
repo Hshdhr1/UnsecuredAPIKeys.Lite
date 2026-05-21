@@ -16,6 +16,8 @@ from .huggingface import HuggingFaceProvider
 from .github_search import GitHubSearchProvider
 from .gitlab_search import GitLabSearchProvider
 from .sourcegraph_search import SourceGraphSearchProvider
+from .pastebin_search import PastebinSearchProvider
+from .termbin_search import TermbinSearchProvider
 
 class ApiProviderRegistry:
     _providers: List[Type[BaseApiKeyProvider]] = [
@@ -37,7 +39,9 @@ class ApiProviderRegistry:
     _search_providers: List[Type] = [
         GitHubSearchProvider,
         GitLabSearchProvider,
-        SourceGraphSearchProvider
+        SourceGraphSearchProvider,
+        PastebinSearchProvider,
+        TermbinSearchProvider
     ]
 
     @classmethod

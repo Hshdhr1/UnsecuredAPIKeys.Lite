@@ -6,7 +6,9 @@
         GitHub = 1,
         GitLab = 2,
         BitBucket = 3,
-        SourceGraph = 4
+        SourceGraph = 4,
+        Pastebin = 5,
+        Termbin = 6
     }
 
     public enum ApiStatusEnum

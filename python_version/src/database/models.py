@@ -25,6 +25,8 @@ class SearchProviderEnum(str, Enum):
     GITLAB = "GitLab"
     BITBUCKET = "BitBucket"
     SOURCEGRAPH = "SourceGraph"
+    PASTEBIN = "Pastebin"
+    TERMBIN = "Termbin"
 
 
 class ApiStatusEnum(str, Enum):

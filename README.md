@@ -19,7 +19,7 @@
 
 ### Особенности Python-версии:
 - **Асинхронная архитектура**: Использование `asyncio` и `httpx` для параллельной проверки сотен ключей.
-- **Multi-Source Scraper**: Поддержка автоматического поиска в **GitHub**, **GitLab** и **SourceGraph**.
+- **Multi-Source Scraper**: Поддержка автоматического поиска в **GitHub**, **GitLab**, **SourceGraph**, **Pastebin** и **Termbin**.
 - **Selenium Parsing**: Мощный парсинг GitHub через браузер (Selenium) в обход лимитов API.
 - **Telegram Admin Bot**: Управление системой через Telegram на базе `aiogram` v3.
   - Цветные кнопки (Bot API 9.4+) для удобного управления.
