@@ -24,56 +24,78 @@
 **Ссылка на разработку порта:** [GitHub Repository](https://github.com/Hshdhr1/UnsecuredAPIKeys.Lite/tree/python-port-core-14703047987991639479)
 
 ### Особенности Python-версии:
-- **Асинхронная архитектура**: Использование `asyncio` и `httpx` для быстрой проверки ключей.
-- **Multi-Source Scraper**: Поддержка поиска в GitHub, GitLab и SourceGraph.
-- **Selenium Parsing**: Возможность парсинга GitHub через браузер (Selenium) для обхода лимитов API.
-- **Telegram Admin Bot**: Управление системой через Telegram на базе `aiogram` v3.
-  - Цветные кнопки (Bot API 9.4+).
+- **Асинхронная архитектура**: Использование `asyncio` и `httpx` для максимально быстрой проверки ключей.
+- **Multi-Source Scraper**: Поддержка поиска ключей в GitHub, GitLab и SourceGraph.
+- **Selenium Parsing**: Возможность парсинга GitHub через браузер (Selenium) в обход лимитов API.
+- **Telegram Admin Bot**: Полное управление системой через Telegram на базе `aiogram` v3.
+  - Цветные кнопки (Bot API 9.4+) для удобного управления.
   - Уведомления о найденных ключах в реальном времени.
-  - Кнопка «Проверить» прямо в сообщении.
+  - Интерактивная кнопка «🔎 Проверить» для мгновенной валидации.
 - **Поддержка современных моделей (2026)**: GPT-5.4, Claude 4.6, Gemini 2.5 и др.
-- **Новые провайдеры**: Moonshot AI (Kimi), xAI (Grok), Zhipu AI (GLM), Stripe, HuggingFace.
-- **Улучшенные паттерны**: Точные регулярные выражения для минимизации ложных срабатываний и детекция фейковых ключей.
+- **13+ Провайдеров**: OpenAI, Anthropic, Google, Groq, OpenRouter, Mistral, Moonshot, xAI, Zhipu AI, Perplexity, DeepSeek, Stripe, HuggingFace.
+- **Умная детекция фейков**: Эвристики для фильтрации мусорных и поддельных ключей (например, "ebani", "idinahui").
 
-## 🚀 Быстрый старт (Python)
+---
 
-### 1. Установка зависимостей
+## 🛠️ Полный гайд по установке (Python)
+
+### 1. Предварительные требования
+- **Python 3.12** или выше.
+- **Google Chrome** (для работы Selenium-парсера).
+- **Telegram Bot Token** (получить у [@BotFather](https://t.me/BotFather)).
+
+### 2. Клонирование и подготовка
+```bash
+git clone https://github.com/Hshdhr1/UnsecuredAPIKeys.Lite.git
+cd UnsecuredAPIKeys.Lite
+```
+
+### 3. Настройка виртуального окружения
+Рекомендуется использовать venv для изоляции зависимостей:
+```bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# Linux / macOS
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 4. Установка зависимостей
 ```bash
 pip install -r python_version/requirements.txt
 ```
 
-### 2. Настройка переменных окружения
-Создайте файл `.env` в корне проекта:
+### 5. Настройка переменных окружения
+Создайте файл `.env` в корневой директории проекта и заполните его:
 ```env
+# URL базы данных (SQLite по умолчанию, для PostgreSQL используйте postgresql+asyncpg://...)
 DATABASE_URL=sqlite+aiosqlite:///dev.db
-TELEGRAM_BOT_TOKEN=ваш_токен
-TELEGRAM_ADMIN_ID=ваш_id
+
+# Токен вашего Telegram бота
+TELEGRAM_BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrSTU
+
+# Ваш Telegram ID (чтобы бот слушался только вас)
+# Узнать ID можно у бота @userinfobot
+TELEGRAM_ADMIN_ID=123456789
 ```
 
-### 3. Запуск
+### 6. Первый запуск
+Запустите основной скрипт из корневой директории проекта. База данных будет создана автоматически при первом запуске:
 ```bash
-python3 python_version/src/main.py
+# Запуск как модуля (рекомендуется)
+PYTHONPATH=. python3 -m python_version.src.main
 ```
 
-## 🛠️ Технологический стек
+### 7. Использование Telegram бота
+После запуска напишите боту `/start`. Вам откроется меню:
+- **📦 Выгрузить ключи**: Показать последние найденные ключи из базы.
+- **🔑 Добавить токен**: Позволяет добавить GitHub (`ghp_...`), GitLab (`glpat-`) или SourceGraph (`sgp_`) токены для API-сканирования.
+- **🌐 Источники**: Показать текущие активные токены для парсинга.
+- **🌐 Selenium Парсинг**: Запустить браузерный поиск по ключевым словам.
 
-### Бэкенд (Оригинал)
-- **.NET 9**
-- **Entity Framework Core**
-- **PostgreSQL**
-- **SignalR**
-
-### Бэкенд (Python)
-- **Python 3.12+**
-- **SQLAlchemy 2.0**
-- **aiogram 3.x**
-- **httpx**
-- **aiosqlite / asyncpg**
-
-### Фронтенд
-- **Next.js 14**
-- **HeroUI / Tailwind CSS**
-- **Framer Motion**
+---
 
 ## 📝 Лицензия
 
@@ -88,7 +110,7 @@ python3 python_version/src/main.py
 - Ссылка: `https://github.com/TSCarterJr/UnsecuredAPIKeys-OpenSource`
 - Должна быть видна на главной странице или в футере.
 
-Это относится ко всему проекту, только к API бэкенда, логике валидации, ботам или любому другому компоненту. **Удаление атрибуции нарушает лицензию и является нарушением авторских прав.**
+Удаление атрибуции нарушает лицензию и является нарушением авторских прав.
 
 ---
 
