@@ -175,9 +175,7 @@ class TelegramBot:
                     dummy_token = SearchProviderToken(token="selenium", search_provider=SearchProviderEnum.GITHUB)
 
                     # Create a temporary ScraperBot instance to reuse process_repo_reference
-                    # Pass correct db_url from session_factory's engine if available or use a valid dummy
-                    db_url = str(self.session_factory.kw['bind'].url)
-                    scraper_bot = ScraperBot(db_url, tg_bot=self)
+                    scraper_bot = ScraperBot(self.db_url, tg_bot=self)
 
                     for res in results:
                         ref = RepoReference(
