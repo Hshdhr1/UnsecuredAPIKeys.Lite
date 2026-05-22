@@ -8,7 +8,22 @@
         BitBucket = 3,
         SourceGraph = 4,
         Pastebin = 5,
-        Termbin = 6
+        Termbin = 6,
+        Bitbucket = 7,
+        Gitee = 8,
+        Codeberg = 9,
+        Gist = 10,
+        NPM = 11,
+        PyPI = 12,
+        DockerHub = 13,
+        GoogleDork = 14,
+        BingDork = 15,
+        IntelligenceX = 16,
+        PublicWWW = 17,
+        SourceForge = 18,
+        Launchpad = 19,
+        Ghostbin = 20,
+        Hastebin = 21
     }
 
     public enum ApiStatusEnum

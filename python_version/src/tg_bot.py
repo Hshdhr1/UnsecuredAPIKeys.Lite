@@ -41,10 +41,10 @@ class TelegramBot:
             return
 
         builder = ReplyKeyboardBuilder()
-        builder.button(text="📦 Выгрузить ключи", style="success")
-        builder.button(text="🔑 Добавить токен", style="primary")
-        builder.button(text="🌐 Источники", style="primary")
-        builder.button(text="🌐 Selenium Парсинг", style="primary")
+        builder.button(text="📦 Выгрузить ключи")
+        builder.button(text="🔑 Добавить токен")
+        builder.button(text="🌐 Источники")
+        builder.button(text="🌐 Selenium Парсинг")
         builder.adjust(2)
 
         await message.answer(
@@ -129,7 +129,7 @@ class TelegramBot:
 
     async def notify_new_key(self, key_id: int, api_type: str, api_key: str):
         builder = InlineKeyboardBuilder()
-        builder.button(text="🔎 Проверить", callback_data=f"verify_{key_id}", style="success")
+        builder.button(text="🔎 Проверить", callback_data=f"verify_{key_id}")
 
         text = (
             f"🔔 **Найден новый ключ!**\n\n"
