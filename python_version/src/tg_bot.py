@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import httpx
 from typing import Optional
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
@@ -28,6 +29,7 @@ class TelegramBot:
         self.dp.message.register(self.cmd_export, F.text == "📦 Выгрузить ключи")
         self.dp.message.register(self.cmd_add_token, F.text == "🔑 Добавить токен")
         self.dp.message.register(self.cmd_sources, F.text == "🌐 Источники")
+        self.dp.message.register(self.cmd_add_query, Command("add_query"))
 
         self.dp.callback_query.register(self.verify_key_callback, F.data.startswith("verify_"))
 
@@ -117,6 +119,12 @@ class TelegramBot:
         elif token == "termbin": provider = SearchProviderEnum.TERMBIN
 
         async with self.session_factory() as session:
+            # Duplicate check
+            existing = await session.execute(select(SearchProviderToken).where(SearchProviderToken.token == token))
+            if existing.scalar_one_or_none():
+                await message.answer("⚠️ Этот токен уже добавлен.")
+                return
+
             new_token = SearchProviderToken(
                 token=token,
                 search_provider=provider,
@@ -125,7 +133,30 @@ class TelegramBot:
             session.add(new_token)
             await session.commit()
 
-        await message.answer(f"✅ Токен {provider.value} успешно добавлен и активирован.")
+        await message.answer(f"✅ Токен {provider.name} успешно добавлен и активирован.")
+
+    async def cmd_add_query(self, message: types.Message):
+        if message.from_user.id != self.admin_id: return
+
+        from .database.models import SearchQuery
+        from datetime import datetime, timedelta, timezone
+
+        args = message.text.split(maxsplit=1)
+        if len(args) < 2:
+            await message.answer("Использование: `/add_query sk-`", parse_mode="Markdown")
+            return
+
+        query_text = args[1].strip()
+        async with self.session_factory() as session:
+            new_query = SearchQuery(
+                query=query_text,
+                is_enabled=True,
+                last_search_utc=datetime.now(timezone.utc) - timedelta(days=1)
+            )
+            session.add(new_query)
+            await session.commit()
+
+        await message.answer(f"✅ Поисковый запрос `{query_text}` добавлен.", parse_mode="Markdown")
 
     async def notify_new_key(self, key_id: int, api_type: str, api_key: str):
         builder = InlineKeyboardBuilder()
@@ -204,10 +235,11 @@ class TelegramBot:
     async def verify_key_callback(self, callback: types.CallbackQuery):
         if callback.from_user.id != self.admin_id: return
 
+        from .verifier import VerifierBot
+
         key_id = int(callback.data.split("_")[1])
         await callback.answer("Запуск проверки...")
 
-        from .verifier import VerifierBot
         verifier = VerifierBot(self.db_url)
 
         async with self.session_factory() as session:
@@ -219,7 +251,6 @@ class TelegramBot:
                 await callback.message.answer("Ключ не найден в БД.")
                 return
 
-            import httpx
             async with httpx.AsyncClient(timeout=30.0) as client:
                 await verifier.verify_single_key(session, key, client)
                 await session.commit()

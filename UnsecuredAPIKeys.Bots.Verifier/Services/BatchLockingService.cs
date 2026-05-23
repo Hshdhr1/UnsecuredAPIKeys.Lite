@@ -65,8 +65,10 @@ namespace UnsecuredAPIKeys.Bots.Verifier.Services
                     _logger.LogDebug("Found {Count} active batches blocking key ranges", activeBatches.Count);
 
                     // Build a query for keys that need verification
-                    // No restrictions on status - process all keys to ensure validity
-                    var keysQuery = dbContext.APIKeys.AsQueryable();
+                    // Exclude keys known to be removed/invalidated by owner
+                    var keysQuery = dbContext.APIKeys
+                        .Where(s => s.Status != ApiStatusEnum.Removed &&
+                                   s.Status != ApiStatusEnum.FlaggedForRemoval);
 
                     // Exclude keys already in active batches
                     foreach (var activeBatch in activeBatches)

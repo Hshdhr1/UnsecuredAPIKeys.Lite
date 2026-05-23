@@ -80,9 +80,11 @@ class ScraperBot:
         # Fetch content from ref.api_content_url and find keys
         self.logger.info(f"Processing reference: {ref.file_url}")
 
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
             try:
-                headers = {}
+                headers = {
+                    "User-Agent": "UnsecuredAPIKeys-Scraper/1.0"
+                }
                 if ref.provider == "GitHub":
                     headers["Authorization"] = f"token {token.token}"
                 elif ref.provider == "GitLab":
@@ -90,19 +92,20 @@ class ScraperBot:
 
                 response = await client.get(ref.api_content_url, headers=headers)
                 if response.status_code == 200:
-                    data = response.json()
                     content = ""
 
-                    if ref.provider == "GitHub":
-                        # GitHub Content API returns base64 encoded content
+                    # If it's an API URL, it's likely JSON with base64 content
+                    # If it's a raw URL (from Selenium), it's direct text
+                    if "api.github.com" in ref.api_content_url:
+                        data = response.json()
                         content_b64 = data.get("content", "").replace("\n", "")
                         content = base64.b64decode(content_b64).decode("utf-8", errors="ignore")
-                    elif ref.provider == "GitLab":
-                        # GitLab Repository Files API returns base64 encoded content
+                    elif "gitlab.com/api" in ref.api_content_url:
+                        data = response.json()
                         content_b64 = data.get("content", "")
                         content = base64.b64decode(content_b64).decode("utf-8", errors="ignore")
                     else:
-                        # Fallback for direct text or other providers
+                        # Fallback for direct text (raw.githubusercontent.com, pastebin, etc.)
                         content = response.text
 
                     # Run regex patterns from all providers
@@ -165,4 +168,6 @@ class ScraperBot:
         self.logger.info(f"Saved new key found via query {query_id}")
 
         if self.tg_bot:
-            await self.tg_bot.notify_new_key(new_key.id, str(new_key.api_type), new_key.api_key)
+            # Use name property for cleaner display
+            api_type_name = str(new_key.api_type.name) if hasattr(new_key.api_type, 'name') else str(new_key.api_type)
+            await self.tg_bot.notify_new_key(new_key.id, api_type_name, new_key.api_key)

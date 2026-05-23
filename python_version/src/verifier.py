@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import httpx
+import re
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Dict
 from sqlalchemy import select, update
@@ -42,7 +43,6 @@ class VerifierBot:
         self.logger.info("Verification cycle completed.")
 
     async def verify_single_key(self, session: AsyncSession, key: APIKey, client: httpx.AsyncClient):
-        import re
         provider = None
         for p in self.providers:
             for pattern in p.regex_patterns:
@@ -67,8 +67,9 @@ class VerifierBot:
             key.last_checked_utc = datetime.now(timezone.utc)
             if result.status == ValidationAttemptStatus.VALID:
                 try:
-                    key.api_type = ApiTypeEnum(provider.api_type)
-                except ValueError:
+                    # In IntEnum, we can lookup by name
+                    key.api_type = ApiTypeEnum[provider.api_type]
+                except (KeyError, ValueError):
                     key.api_type = ApiTypeEnum.UNKNOWN
                 key.error_count = 0
             elif result.status in (ValidationAttemptStatus.HTTP_ERROR, ValidationAttemptStatus.NETWORK_ERROR):

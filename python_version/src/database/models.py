@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from enum import Enum
+from enum import IntEnum
 from typing import List, Optional
 from sqlalchemy import (
     BigInteger,
@@ -19,78 +19,78 @@ class Base(DeclarativeBase):
     pass
 
 
-class SearchProviderEnum(str, Enum):
-    UNKNOWN = "Unknown"
-    GITHUB = "GitHub"
-    GITLAB = "GitLab"
-    BITBUCKET = "Bitbucket"
-    SOURCEGRAPH = "SourceGraph"
-    PASTEBIN = "Pastebin"
-    TERMBIN = "Termbin"
-    GITEE = "Gitee"
-    CODEBERG = "Codeberg"
-    GIST = "Gist"
-    NPM = "NPM"
-    PYPI = "PyPI"
-    DOCKERHUB = "DockerHub"
-    GOOGLE_DORK = "GoogleDork"
-    BING_DORK = "BingDork"
-    INTELLIGENCE_X = "IntelligenceX"
-    PUBLIC_WWW = "PublicWWW"
-    SOURCEFORGE = "SourceForge"
-    LAUNCHPAD = "Launchpad"
-    GHOSTBIN = "Ghostbin"
-    HASTEBIN = "Hastebin"
+class SearchProviderEnum(IntEnum):
+    UNKNOWN = -99
+    GITHUB = 1
+    GITLAB = 2
+    BITBUCKET = 3
+    SOURCEGRAPH = 4
+    PASTEBIN = 5
+    TERMBIN = 6
+    GITEE = 8
+    CODEBERG = 9
+    GIST = 10
+    NPM = 11
+    PYPI = 12
+    DOCKERHUB = 13
+    GOOGLE_DORK = 14
+    BING_DORK = 15
+    INTELLIGENCE_X = 16
+    PUBLIC_WWW = 17
+    SOURCEFORGE = 18
+    LAUNCHPAD = 19
+    GHOSTBIN = 20
+    HASTEBIN = 21
 
 
-class ApiStatusEnum(str, Enum):
-    UNVERIFIED = "Unverified"
-    VALID = "Valid"
-    INVALID = "Invalid"
-    REMOVED = "Removed"
-    FLAGGED_FOR_REMOVAL = "FlaggedForRemoval"
-    NO_LONGER_WORKING = "NoLongerWorking"
-    ERROR = "Error"
-    VALID_NO_CREDITS = "ValidNoCredits"
+class ApiStatusEnum(IntEnum):
+    UNVERIFIED = -99
+    VALID = 1
+    INVALID = 0
+    REMOVED = 3
+    FLAGGED_FOR_REMOVAL = 4
+    NO_LONGER_WORKING = 5
+    ERROR = 6
+    VALID_NO_CREDITS = 7
 
 
-class ApiTypeEnum(str, Enum):
-    UNKNOWN = "Unknown"
-    OPENAI = "OpenAI"
-    AZURE_OPENAI = "AzureOpenAI"
-    ANTHROPIC_CLAUDE = "AnthropicClaude"
-    GOOGLE_AI = "GoogleAI"
-    COHERE = "Cohere"
-    HUGGINGFACE = "HuggingFace"
-    STABILITY_AI = "StabilityAI"
-    MISTRAL_AI = "MistralAI"
-    REPLICATE = "Replicate"
-    TOGETHER_AI = "TogetherAI"
-    OPENROUTER = "OpenRouter"
-    PERPLEXITY_AI = "PerplexityAI"
-    GROQ = "Groq"
-    DEEPSEEK = "DeepSeek"
-    ELEVENLABS = "ElevenLabs"
-    RUNWAY_ML = "RunwayML"
-    ASSEMBLY_AI = "AssemblyAI"
-    PINECONE = "Pinecone"
-    WEAVIATE = "Weaviate"
-    CHROMA_DB = "ChromaDB"
-    LANGCHAIN = "LangChain"
-    MOONSHOT_AI = "MoonshotAI"
-    XAI = "XAI"
-    ZHIPU_AI = "ZhipuAI"
-    STRIPE = "Stripe"
-    AWS = "AWS"
-    AZURE = "Azure"
-    GCP = "GCP"
-    GITHUB = "GitHub"
-    GITLAB = "GitLab"
-    BITBUCKET = "BitBucket"
-    SENDGRID = "SendGrid"
-    TWILIO = "Twilio"
-    MONGODB = "MongoDB"
-    FIREBASE = "Firebase"
+class ApiTypeEnum(IntEnum):
+    UNKNOWN = -99
+    OPENAI = 100
+    AZURE_OPENAI = 110
+    ANTHROPIC_CLAUDE = 120
+    GOOGLE_AI = 130
+    COHERE = 140
+    HUGGINGFACE = 150
+    STABILITY_AI = 160
+    MISTRAL_AI = 170
+    REPLICATE = 180
+    TOGETHER_AI = 190
+    OPENROUTER = 195
+    PERPLEXITY_AI = 196
+    GROQ = 197
+    DEEPSEEK = 198
+    ELEVENLABS = 199
+    RUNWAY_ML = 201
+    ASSEMBLY_AI = 202
+    PINECONE = 203
+    WEAVIATE = 204
+    CHROMA_DB = 205
+    LANGCHAIN = 206
+    MOONSHOT_AI = 207
+    XAI = 208
+    ZHIPU_AI = 209
+    AWS = 200
+    AZURE = 210
+    GCP = 220
+    GITHUB = 300
+    GITLAB = 310
+    BITBUCKET = 320
+    STRIPE = 400
+    SENDGRID = 410
+    TWILIO = 420
+    MONGODB = 430
+    FIREBASE = 440
 
 
 class APIKey(Base):
