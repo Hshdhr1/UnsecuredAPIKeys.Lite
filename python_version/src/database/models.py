@@ -41,6 +41,21 @@ class SearchProviderEnum(IntEnum):
     LAUNCHPAD = 19
     GHOSTBIN = 20
     HASTEBIN = 21
+    SHODAN = 22
+    CENSYS = 23
+    BINARYEDGE = 24
+    GRAYHATWARFARE = 25
+    HUNTERIO = 26
+    DEHASHED = 27
+    LEAKLOOKUP = 28
+    SNUSBASE = 29
+    WAYBACK_MACHINE = 30
+    COMMON_CRAWL = 31
+    REDDIT = 32
+    TWITTER = 33
+    DISCORD = 34
+    SLACK = 35
+    TRELLO = 36
 
 
 class ApiStatusEnum(IntEnum):

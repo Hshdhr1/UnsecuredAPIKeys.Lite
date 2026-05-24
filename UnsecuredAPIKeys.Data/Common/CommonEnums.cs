@@ -23,7 +23,22 @@
         SourceForge = 18,
         Launchpad = 19,
         Ghostbin = 20,
-        Hastebin = 21
+        Hastebin = 21,
+        Shodan = 22,
+        Censys = 23,
+        BinaryEdge = 24,
+        GrayHatWarfare = 25,
+        HunterIO = 26,
+        DeHashed = 27,
+        LeakLookup = 28,
+        SnusBase = 29,
+        WaybackMachine = 30,
+        CommonCrawl = 31,
+        Reddit = 32,
+        Twitter = 33,
+        Discord = 34,
+        Slack = 35,
+        Trello = 36
     }
 
     public enum ApiStatusEnum

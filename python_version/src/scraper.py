@@ -53,17 +53,32 @@ class ScraperBot:
         # Get all enabled tokens
         stmt = select(SearchProviderToken).where(SearchProviderToken.is_enabled == True)
         result = await session.execute(stmt)
-        tokens = result.scalars().all()
+        tokens = list(result.scalars().all())
+
+        search_providers = self.registry.get_all_search_providers()
+
+        # Add virtual tokens for public providers that don't need auth
+        public_providers = ["Pastebin", "Termbin", "Gist", "Ghostbin", "Hastebin", "GoogleDork", "BingDork"]
+        for p_name in public_providers:
+            try:
+                p_enum = SearchProviderEnum[p_name.upper()]
+                # Check if we already have a token for this
+                if not any(t.search_provider == p_enum for t in tokens):
+                    tokens.append(SearchProviderToken(id=0, token="public", search_provider=p_enum, is_enabled=True))
+            except KeyError: continue
 
         if not tokens:
             self.logger.warning("No search provider tokens available.")
             return
 
-        search_providers = self.registry.get_all_search_providers()
-
         for token in tokens:
-            # Find matching provider
-            provider = next((p for p in search_providers if p.provider_name.lower() == token.search_provider.value.lower()), None)
+            # Find matching provider by Enum member name or string value
+            token_p_name = token.search_provider.name.lower()
+            provider = next((p for p in search_providers if p.provider_name.lower() == token_p_name), None)
+
+            if not provider:
+                # Try by value if name didn't match (for custom enums)
+                provider = next((p for p in search_providers if p.provider_name.lower() == token.search_provider.value.lower()), None)
 
             if not provider:
                 continue

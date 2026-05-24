@@ -216,9 +216,17 @@ class TelegramBot:
         queries = ["sk-", "sk-proj-", "AIza", "gsk_"]
         total_results = 0
 
-        for query in queries:
-            await message.answer(f"🔍 Поиск в браузере: `{query}`", parse_mode="Markdown")
-            results = await scraper.search_github_browser(query)
+        # Perform both code and repository search
+        for search_type in ["code", "repositories"]:
+            await message.answer(f"📦 Тип поиска: `{search_type}`", parse_mode="Markdown")
+
+            for query in queries:
+                await message.answer(f"🔍 Поиск: `{query}`", parse_mode="Markdown")
+
+                # We need to pass search_type to search_github_browser
+                # Let's adjust the wrapper method
+                loop = asyncio.get_event_loop()
+                results = await loop.run_in_executor(None, scraper._sync_search, query, search_type)
 
             if results:
                 await message.answer(f"✅ Найдено ссылок для `{query}`: {len(results)}. Начинаю обработку контента...", parse_mode="Markdown")

@@ -35,27 +35,53 @@ class SeleniumScraper:
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, self._sync_search, query)
 
-    def _sync_search(self, query: str) -> List[dict]:
+    def _sync_search(self, query: str, search_type: str = "code") -> List[dict]:
         results = []
         driver = self.get_driver()
         try:
-            url = f"https://github.com/search?q={query}&type=code"
+            url = f"https://github.com/search?q={query}&type={search_type}"
             self.logger.info(f"Selenium opening: {url}")
             driver.get(url)
 
             # Wait for search results to load
             wait = WebDriverWait(driver, 15)
             try:
-                # GitHub's search results selector might change, using a common one
-                wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.code-list-item, div.Box-row")))
+                if search_type == "repositories":
+                    # Repositories search results selector
+                    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.repo-list-item, div.Box-row, a.v-align-middle")))
+                    items = driver.find_elements(By.CSS_SELECTOR, "div.Box-row")
+                    for item in items:
+                        try:
+                            # In repo search, find repo links
+                            link_element = item.find_element(By.CSS_SELECTOR, "a.v-align-middle")
+                            repo_url = link_element.get_attribute("href")
 
-                # Extract links to files
-                items = driver.find_elements(By.CSS_SELECTOR, "div.Box-row")
-                for item in items:
-                    try:
-                        link_element = item.find_element(By.CSS_SELECTOR, "a[title]")
-                        file_url = link_element.get_attribute("href")
-                        file_path = link_element.get_attribute("title")
+                            # For repo search, we might want to crawl common files
+                            # For now, let's just add the repo itself as a reference
+                            # (ScraperBot will need to handle this)
+                            parts = repo_url.split('/')
+                            if len(parts) >= 5:
+                                owner = parts[3]
+                                name = parts[4]
+                                results.append({
+                                    "repo_url": repo_url,
+                                    "file_url": f"{repo_url}/blob/main/README.md",
+                                    "api_content_url": f"https://raw.githubusercontent.com/{owner}/{name}/main/README.md",
+                                    "repo_owner": owner,
+                                    "repo_name": name,
+                                    "file_path": "README.md",
+                                    "provider": "GitHub"
+                                })
+                        except Exception: continue
+                else:
+                    # Default: code search
+                    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.code-list-item, div.Box-row")))
+                    items = driver.find_elements(By.CSS_SELECTOR, "div.Box-row")
+                    for item in items:
+                        try:
+                            link_element = item.find_element(By.CSS_SELECTOR, "a[title]")
+                            file_url = link_element.get_attribute("href")
+                            file_path = link_element.get_attribute("title")
 
                         # Extract repo info from URL
                         # https://github.com/owner/repo/blob/branch/path
