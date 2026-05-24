@@ -224,42 +224,41 @@ class TelegramBot:
                 await message.answer(f"🔍 Поиск: `{query}`", parse_mode="Markdown")
 
                 # We need to pass search_type to search_github_browser
-                # Let's adjust the wrapper method
                 loop = asyncio.get_event_loop()
                 results = await loop.run_in_executor(None, scraper._sync_search, query, search_type)
 
-            if results:
-                await message.answer(f"✅ Найдено ссылок для `{query}`: {len(results)}. Начинаю обработку контента...", parse_mode="Markdown")
+                if results:
+                    await message.answer(f"✅ Найдено ссылок для `{query}`: {len(results)}. Начинаю обработку контента...", parse_mode="Markdown")
 
-                # Use ScraperBot logic to process these references
-                from .database.models import RepoReference, SearchProviderToken, SearchProviderEnum
+                    # Use ScraperBot logic to process these references
+                    from .database.models import RepoReference, SearchProviderToken, SearchProviderEnum
 
-                async with self.session_factory() as session:
-                    # We need a dummy token object or similar if the method requires it
-                    dummy_token = SearchProviderToken(token="selenium", search_provider=SearchProviderEnum.GITHUB)
+                    async with self.session_factory() as session:
+                        # We need a dummy token object or similar if the method requires it
+                        dummy_token = SearchProviderToken(token="selenium", search_provider=SearchProviderEnum.GITHUB)
 
-                    # Create a temporary ScraperBot instance to reuse process_repo_reference
-                    scraper_bot = ScraperBot(self.db_url, tg_bot=self)
+                        # Create a temporary ScraperBot instance to reuse process_repo_reference
+                        scraper_bot = ScraperBot(self.db_url, tg_bot=self)
 
-                    for res in results:
-                        ref = RepoReference(
-                            repo_url=res["repo_url"],
-                            file_url=res["file_url"],
-                            api_content_url=res["api_content_url"],
-                            repo_owner=res["repo_owner"],
-                            repo_name=res["repo_name"],
-                            file_path=res["file_path"],
-                            provider=res["provider"],
-                            repo_id=0,
-                            search_query_id=0,
-                            line_number=1
-                        )
-                        await scraper_bot.process_repo_reference(session, ref, 0, dummy_token)
-                        await session.commit()
+                        for res in results:
+                            ref = RepoReference(
+                                repo_url=res["repo_url"],
+                                file_url=res["file_url"],
+                                api_content_url=res["api_content_url"],
+                                repo_owner=res["repo_owner"],
+                                repo_name=res["repo_name"],
+                                file_path=res["file_path"],
+                                provider=res["provider"],
+                                repo_id=0,
+                                search_query_id=0,
+                                line_number=1
+                            )
+                            await scraper_bot.process_repo_reference(session, ref, 0, dummy_token)
+                            await session.commit()
 
-                total_results += len(results)
-            else:
-                await message.answer(f"ℹ️ По запросу `{query}` ничего не найдено.", parse_mode="Markdown")
+                    total_results += len(results)
+                else:
+                    await message.answer(f"ℹ️ По запросу `{query}` ничего не найдено.", parse_mode="Markdown")
 
         await message.answer(f"🏁 **Selenium парсинг завершен.**\nВсего ссылок обработано: {total_results}", parse_mode="Markdown")
 

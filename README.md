@@ -76,10 +76,15 @@ TELEGRAM_ADMIN_ID=123456789
 ```
 
 ### 6. Запуск проекта
-Запустите основной скрипт из корневой директории. Все таблицы в базе данных будут созданы автоматически:
+Для запуска интерактивного меню (рекомендуется):
 ```bash
 # Запуск через PYTHONPATH, чтобы правильно работали импорты
-PYTHONPATH=. python3 -m python_version.src.main
+PYTHONPATH=. python3 python_version/src/sq_scanner.py
+```
+
+Для запуска фонового сервиса (без меню):
+```bash
+PYTHONPATH=. python3 python_version/src/main.py
 ```
 
 ### 7. Работа с Telegram ботом

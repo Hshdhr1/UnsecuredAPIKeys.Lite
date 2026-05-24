@@ -13,6 +13,7 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 
 class Base(DeclarativeBase):
@@ -188,3 +189,14 @@ class SearchProviderToken(Base):
     )
     is_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     last_used_utc: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+
+async def init_db(db_url: str):
+    engine = create_async_engine(db_url)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+def get_session_factory(db_url: str):
+    engine = create_async_engine(db_url)
+    return async_sessionmaker(engine, expire_on_commit=False)
