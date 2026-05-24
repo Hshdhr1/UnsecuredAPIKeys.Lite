@@ -30,6 +30,7 @@ class TelegramBot:
         self.dp.message.register(self.cmd_add_token, F.text == "🔑 Добавить токен")
         self.dp.message.register(self.cmd_sources, F.text == "🌐 Источники")
         self.dp.message.register(self.cmd_add_query, Command("add_query"))
+        self.dp.message.register(self.cmd_seed, Command("seed"))
 
         self.dp.callback_query.register(self.verify_key_callback, F.data.startswith("verify_"))
 
@@ -134,6 +135,28 @@ class TelegramBot:
             await session.commit()
 
         await message.answer(f"✅ Токен {provider.name} успешно добавлен и активирован.")
+
+    async def cmd_seed(self, message: types.Message):
+        if message.from_user.id != self.admin_id: return
+
+        from .database.models import SearchQuery
+        from datetime import datetime, timedelta, timezone
+
+        default_patterns = ["sk-", "sk-proj-", "AIza", "gsk_", "pplx-", "xai-", "sk_test_"]
+        async with self.session_factory() as session:
+            for pattern in default_patterns:
+                # Basic check to avoid exact duplicates
+                stmt = select(SearchQuery).where(SearchQuery.query == pattern)
+                existing = await session.execute(stmt)
+                if not existing.scalar_one_or_none():
+                    session.add(SearchQuery(
+                        query=pattern,
+                        is_enabled=True,
+                        last_search_utc=datetime.now(timezone.utc) - timedelta(days=1)
+                    ))
+            await session.commit()
+
+        await message.answer("✅ База данных заполнена стандартными запросами.")
 
     async def cmd_add_query(self, message: types.Message):
         if message.from_user.id != self.admin_id: return

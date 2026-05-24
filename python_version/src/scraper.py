@@ -138,8 +138,9 @@ class ScraperBot:
         now = datetime.now(timezone.utc)
         provider_name = res.get("search_provider", "GitHub")
         try:
-            provider_enum = SearchProviderEnum(provider_name)
-        except ValueError:
+            # Map string name to IntEnum member
+            provider_enum = SearchProviderEnum[provider_name.upper()]
+        except (KeyError, ValueError):
             provider_enum = SearchProviderEnum.UNKNOWN
 
         new_key = APIKey(

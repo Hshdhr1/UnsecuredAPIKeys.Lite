@@ -59,6 +59,7 @@ class SourceGraphSearchProvider(BaseSearchProvider):
                 results.append(RepoReference(
                     search_query_id=query.id,
                     provider=self.provider_name,
+                    repo_id=0,
                     repo_owner=name_parts[0] if len(name_parts) > 1 else None,
                     repo_name=name_parts[1] if len(name_parts) > 1 else repo.get("name"),
                     repo_url=repo.get("url"),

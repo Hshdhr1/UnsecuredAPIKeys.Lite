@@ -48,6 +48,7 @@ class GitHubSearchProvider(BaseSearchProvider):
                     results.append(RepoReference(
                         search_query_id=query.id,
                         provider=self.provider_name,
+                        repo_id=repo.get("id", 0),
                         repo_owner=repo.get("owner", {}).get("login"),
                         repo_name=repo.get("name"),
                         repo_url=repo.get("html_url"),
