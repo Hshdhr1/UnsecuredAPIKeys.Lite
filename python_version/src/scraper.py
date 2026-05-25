@@ -22,6 +22,8 @@ class ScraperBot:
         self.tg_bot = tg_bot
         self.registry = ApiProviderRegistry()
         self.providers = self.registry.get_all_providers()
+        self.on_item_scanned = None
+        self.on_key_found = None
 
     async def run_cycle(self):
         self.logger.info("Starting scraping cycle...")
@@ -94,6 +96,8 @@ class ScraperBot:
     async def process_repo_reference(self, session: AsyncSession, ref: RepoReference, query_id: int, token: SearchProviderToken):
         # Fetch content from ref.api_content_url and find keys
         self.logger.info(f"Processing reference: {ref.file_url}")
+        if self.on_item_scanned:
+            self.on_item_scanned()
 
         async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
             try:
@@ -180,6 +184,9 @@ class ScraperBot:
 
         session.add(new_key)
         await session.flush()  # To get the ID
+
+        if self.on_key_found:
+            self.on_key_found(new_key)
 
         self.logger.info(f"Saved new key found via query {query_id}")
 
